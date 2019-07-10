@@ -45,50 +45,43 @@ public class AdminService {
 	}
 
 	private AdminFacade getFacade() {
-
 		AdminFacade admin = null;
 		admin = (AdminFacade) request.getSession(false).getAttribute("facade");
 		return admin;
 	}
 
 	// Create a new company in the db
-	@GET
+	@POST
 	@Path("createCompany")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String createCompany(@QueryParam("id")int id, @QueryParam("name") String comp_Name, @QueryParam("pass") String password, @QueryParam("email") String email) {
-
-		System.out.println(comp_Name +" "+password +" "+email);
+	public String createCompany(Company company) throws Exception {
+		
 		AdminFacade admin = getFacade();
-		String failMsg = "FAILED TO ADD A NEW COMPANY: " + "There is already a company with the same name: " + comp_Name
-				+ " - please change the company name"; // debug
-
-		Company company = new Company(id, comp_Name, password, email);
+		String failMsg = "FAILED TO ADD A NEW COMPANY: " + "There is already a company with the same name: " 
+							+ company.getComp_name() + " - please change the company name"; // debug
 
 		try {
-			if (company != null) {
-				admin.insertCompany(company);
-				return "SUCCEED TO ADD A NEW COMPANY: name = " + comp_Name + ", id = " + company.getId();
-			}
+			admin.insertCompany(company);
+			return new Gson().toJson(company);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		return failMsg;
-
 	}
 
 	// REMOVE a Company
-	@GET
-	@Path("removeCompany")	
+	@DELETE
+	@Path("removeCompany/{companyId}")	
 	@Produces(MediaType.APPLICATION_JSON)
-	public String removeCompany(@QueryParam("company") Company company) {
+	public String removeCompany(@PathParam("companyId") long id) {
 
-		String failMsg = "FAILED TO REMOVE A COMPANY: there is no such id! " + company.getId()
+		String failMsg = "FAILED TO REMOVE A COMPANY: there is no such id! " + id
 		+ " - please enter another company id";
 
 		AdminFacade admin = getFacade();
+		Company company = null;
 		try {
-			company = admin.getCompany(company.getId());
+			company = admin.getCompany(id);
 			if (company != null) {
 				admin.removeCompany(company);
 				return "SUCCEED TO REMOVE A COMPANY: name = " + company.getComp_name() ;
@@ -99,33 +92,28 @@ public class AdminService {
 		return failMsg;
 	}
 
-	@PUT
+	@POST
 	@Path("updateCompany")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String updateCompany(@QueryParam("compId") long id, @QueryParam("pass") String password,
-			@QueryParam("email") String email) {
+	public String updateCompany(@QueryParam("compId") long id, @QueryParam("password") String password,
+			@QueryParam("email") String email) throws Exception {
 
 		AdminFacade admin = getFacade();
-
 		try {
 			Company company = admin.getCompany(id);
 			if (company != null) {
-				company.setPassword(password);
-				company.setEmail(email);
 				admin.updateCompany(company, password, email);
 				return "SUCCEED TO UPDATE A COMPANY: pass = " + company.getPassword() + ",e-mail = "
 				+ company.getEmail() + ", id = " + id;
 			}
-
 		} catch (Exception e) {
 			System.out.println(e);
 		}
-
 		return "FAILED TO UPDATE A COMPANY: there is no such id! " + id + " - please enter another company id";
 	}
 
 	@GET
-	@Path("getcompany")
+	@Path("getcompany/{compId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getCompany(@PathParam("compId") long id)  {
 		AdminFacade admin = getFacade();
@@ -166,72 +154,64 @@ public class AdminService {
 		return null;
 	}
 
-	// CREATE a new Customer - add a customer to the Customer Table in DB
-	@GET
+//	// CREATE a new Customer - add a customer to the Customer Table in DB
+	@POST
 	@Path("createCustomer")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public String createCustomer(@QueryParam("id") int id, @QueryParam("name") String custName,@QueryParam("pass") String password ) {
+	public String createCustomer(Customer customer ) {
 
 		AdminFacade admin = getFacade();
 		String failMsg = "FAILED TO ADD A NEW CUSTOMER";
-		Customer customer = new Customer(custName, password);
 
-		if(customer != null) {
 			try {
 				admin.insertCustomer(customer);
-				return "SUCCEED TO ADD A NEW CUSTOMER: name = " + custName + ", id = " + customer.getId();
+				return new Gson().toJson(customer);
 			} catch (Exception e) {
 				System.out.println(e);
 				e.printStackTrace();
 			}
-		}
+		
 		return failMsg;
 	}
 
 	// REMOVE Customer
-	@GET
-	@Path("removeCustomer")
+	@DELETE
+	@Path("removeCustomer/{customerId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String removeCustomer(@QueryParam("customer") Customer customer) {
+	public void removeCustomer(@PathParam("customerId") long customerId) {
 
-		String failMsg = "FAILED TO REMOVE A Customer";
 		AdminFacade admin = getFacade();
+		Customer customer = null;
 		try {
-			customer = admin.getCustomerDetails(customer);
+			customer = admin.getCustomer(customerId);
 			if (customer != null) {
 				admin.removeCustomer(customer);
-				return "SUCCEED TO REMOVE A CUSTOMER: name = " + customer.getCust_name() ;
 			}
 		} catch (Exception e) {
 			System.out.println(e);
 		}
-		return failMsg;
 	}
 
-	@PUT
+	@POST
 	@Path("updateCustomer")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String updateCustomer(@QueryParam("customerId") long id, @QueryParam("pass") String password) {
+	public void updateCustomer(@QueryParam("customerId") long id, @QueryParam("password") String password) throws Exception {
 
 		AdminFacade admin = getFacade();
 
 		try {
 			Customer customer = admin.getCustomer(id);
 			if (customer != null) {
-				customer.setPassword(password);
 				admin.updateCustomer(customer, password);
-				return "SUCCEED TO UPDATE A Customer: pass = " + customer.getPassword() + ", id = " + id;
 			}
 
 		} catch (Exception e) {
 			System.out.println(e);
 		}
-
-		return "FAILED TO UPDATE A customer";
 	}
 
 	@GET
-	@Path("getcustomer")
+	@Path("getcustomer/{customerId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getCustomer(@PathParam("customerId") long id)  {
 		AdminFacade admin = getFacade();

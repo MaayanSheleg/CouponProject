@@ -1,8 +1,12 @@
 package com.mbms.main;
 
 import java.sql.Connection;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Set;
 
 import com.mbms.Exceptions.CouponException;
+import com.mbms.beans.Company;
 import com.mbms.dao.Client;
 import com.mbms.dbdao.CompanyDBDAO;
 import com.mbms.dbdao.CustomerDBDAO;
@@ -57,12 +61,20 @@ public class CouponSystem {
 
 		case COMPANY:
 			
-			if (clientType == ClientType.COMPANY) {
-				CompanyDBDAO localcompanydbdao = new CompanyDBDAO();
-				boolean loginSuccess = localcompanydbdao.login(name, password);
-				if(loginSuccess) {
-			client = new CompanyFacade();
-				}}
+			CompanyDBDAO companyDBDAOAO = new CompanyDBDAO();
+
+			Collection<Company>companies = companyDBDAOAO.getAllCompanys();
+			Iterator<Company> i = companies.iterator();
+			
+			while (i.hasNext()) {
+				Company current = i.next();
+				if (current.getComp_name().equals(name) && current.getPassword().equals(password)) {
+					CompanyFacade companyFacade = new CompanyFacade(current);
+					return companyFacade;
+				}else if (!i.hasNext()) {
+					throw new Exception("Login Falied! Invalid User or Password!");
+				}
+			}
 			break;
 
 		case CUSTOMER:

@@ -8,7 +8,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import com.mbms.Exceptions.CouponException;
 import com.mbms.beans.Company;
@@ -42,6 +44,7 @@ public class CompanyFacade implements Client {
 	// full cTor for the companyFacade
 	public CompanyFacade(Company C) {
 		this.company = C;
+		
 	}
 
 	// empty cTor for companyFacade
@@ -49,36 +52,25 @@ public class CompanyFacade implements Client {
 	}
 
 	//this method insert values to coupon table and company_coupon table
-	public void insertCoupon(Coupon coupon, Company company) throws Exception {
-
+	public Coupon insertCoupon(Coupon coupon) throws Exception {
 		try {
-
-			if (coupon.getAmount() < 1) {
-				throw new Exception("Company failed to add coupon - wrong amount: 0, couponId: " + coupon.getID());
+			Set<Coupon> coupons = coupCompanyDao.getAllCoupons();
+			Iterator<Coupon> i = coupons.iterator();
+			while (i.hasNext()) {
+				Coupon current = i.next();
+				if (coupon.getTitle().equals(current.getTitle())) {
+					throw new Exception("This coupon with this title already exists");	
+				}
 			}
+			if (!i.hasNext()) {
+				coupCompanyDao.insertCoupon(coupon);
+				company_CouponDBDao.insertCompany_Coupon(this.company, coupon);
 
-			LocalDate date = Utils.convertToLocalDateViaMilisecond(coupon.getEnd_date());
-			
-			if (date.isBefore(now)) {
-				throw new Exception("Company failed to add coupon - the end date already passed. " + coupon.getID()
-				+ "," + coupon.getEnd_date());
-			}
-			
-		//	String name = coupon.getTitle();
-			
-			if (!coupCompanyDao.ifCouponNameExists(coupon)) {
-	
-			coupCompanyDao.insertCoupon(coupon);
-			long max = company_CouponDBDao.getMaxCouponId();
-			coupon.setID(max);
-			company_CouponDBDao.insertCompany_Coupon(company, coupon);
-			}
-
+			} 
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
-
-			throw new Exception("Company failed to add coupon. couponId: " + coupon.getID());
-		}
+				System.out.println(e.getMessage());
+			}
+		return coupon;
 	}
 
 public void removeCoupon(Coupon fofo) throws Exception {	
