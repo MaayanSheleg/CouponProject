@@ -28,7 +28,7 @@ import com.mbms.main.Utils;
 
 /**
  * @author Maytal & mayaan *
-*/
+ */
 public class CompanyFacade implements Client {
 
 	private ClientType clientType = ClientType.COMPANY;
@@ -44,7 +44,7 @@ public class CompanyFacade implements Client {
 	// full cTor for the companyFacade
 	public CompanyFacade(Company C) {
 		this.company = C;
-		
+
 	}
 
 	// empty cTor for companyFacade
@@ -68,228 +68,295 @@ public class CompanyFacade implements Client {
 
 			} 
 		} catch (Exception e) {
-				System.out.println(e.getMessage());
-			}
+			System.out.println(e.getMessage());
+		}
 		return coupon;
 	}
 
-public void removeCoupon(Coupon fofo) throws Exception {	
-	Coupon coupon = new Coupon();
-	Coupon coco = new Coupon();
-	coupon = fofo;
-	coco =couponDBDao.whatCouponid(fofo);
-	long id = coco.getID();
-	coupon.setID(id);
-	System.out.println(coupon);
-	
-	company_CouponDBDao.removeCompany_Coupon(coupon);
-	customer_CouponDBDao.removebyCouponCustomer(coupon);
-	couponDBDao.removeCoupon(fofo);
+	public void removeCoupon(Coupon fofo) throws Exception {	
+		Coupon coupon = new Coupon();
+		Coupon coco = new Coupon();
+		coupon = fofo;
+		coco =couponDBDao.whatCouponid(fofo);
+		long id = coco.getID();
+		coupon.setID(id);
+		System.out.println(coupon);
 
-	
-}
+		company_CouponDBDao.removeCompany_Coupon(coupon);
+		customer_CouponDBDao.removebyCouponCustomer(coupon);
+		couponDBDao.removeCoupon(fofo);
 
-public void updateCoupon(Coupon titi , java.sql.Date end_date , double price) throws Exception {
-	Coupon coupon = new Coupon();
-	Coupon coco = new Coupon();
-	coupon = titi;
-
-	coco =couponDBDao.whatCouponid(titi);
-	long id = coco.getID();
-	coupon.setID(id);
-	coupon.setEnd_date(end_date);
-	coupon.setPrice(price);
-	System.out.println(coupon);
-
-	coupCompanyDao.updateCoupon(coupon);
-	System.out.println("the coupon " + coupon.getTitle() + " was updated");
-}
-
-// this method return company information
-public void  getDetails (Company company)
-{
-	System.out.println(company);
-}
-
-public List<Coupon> getAllCompanyCoupon(Company company) throws Exception {
-
-	long compId= company.getId();
-
-	List<Long> companyCouponId = company_CouponDBDao.getCouponsByCompanyId(compId);
-
-	List<Coupon> nameCoupons = new ArrayList<Coupon>();
-
-	for (Long id : companyCouponId) {
-
-		nameCoupons.add(couponDBDao.getCoupon(id));
 
 	}
-	return nameCoupons;
 
-}
+	public void updateCoupon(Coupon titi , java.sql.Date end_date , double price) throws Exception {
+		Coupon coupon = new Coupon();
+		Coupon coco = new Coupon();
+		coupon = titi;
 
-public List<Coupon> getCouponbyType(Company company, CouponType type) throws Exception{
+		coco =couponDBDao.whatCouponid(titi);
+		long id = coco.getID();
+		coupon.setID(id);
+		coupon.setEnd_date(end_date);
+		coupon.setPrice(price);
+		System.out.println(coupon);
 
-	List<Coupon> coupons = getAllCompanyCoupon(company);
-	List<Coupon> couponByType = new ArrayList<Coupon>();
-	try {
-		for (Coupon coupon : coupons) {
-
-			if (coupon.getType().equals(type)) {
-
-				couponByType.add(coupon);
-			}}}
-
-	catch (Exception e) {
-		System.out.println(e);
+		coupCompanyDao.updateCoupon(coupon);
+		System.out.println("the coupon " + coupon.getTitle() + " was updated");
 	}
 
-	return couponByType;
-}
+	// this method return company information
+	public void  getDetails (Company company)
+	{
+		System.out.println(company);
+	}
 
-public List<Coupon> getCouponbyprice(Company company, double price) throws Exception{
+	public List<Coupon> getAllCompanyCoupon(Company company) throws Exception {
 
-	List<Coupon> coupons = getAllCompanyCoupon(company);
-	List<Coupon> couponByPrice = new ArrayList<Coupon>();
-	for (Coupon coupon : coupons) {
+		long compId= company.getId();
 
-		if (coupon.getPrice() <=(price)) {
+		List<Long> companyCouponId = company_CouponDBDao.getCouponsByCompanyId(compId);
 
-			couponByPrice.add(coupon);
+		List<Coupon> nameCoupons = new ArrayList<Coupon>();
+
+		for (Long id : companyCouponId) {
+
+			nameCoupons.add(couponDBDao.getCoupon(id));
+
 		}
+		return nameCoupons;
+
 	}
-	return couponByPrice;
-}
 
-public List<Coupon> getCouponbyDate(Company company, Date date) throws Exception{
+	public List<Coupon> getCouponbyType(Company company, CouponType type) throws Exception{
 
-	List<Coupon> coupons = getAllCompanyCoupon(company);
-	List<Coupon> couponByDate = new ArrayList<Coupon>();
-	for (Coupon coupon : coupons) {
-
-		if (coupon.getEnd_date().equals(date) || coupon.getEnd_date().before(date)) {
-			couponByDate.add(coupon);
-		}
-	}
-	return couponByDate;
-}
-
-// method that can retrieve a coupon from the DB by id
-public Coupon getCoupon(long id) throws CouponException {
-	Connection con;
-
-	// Open a connection from the connection pool class
-	try {
-		con = ConnectionPool.getInstance().getConnection();
-	} catch (Exception e) {
-		throw new CouponException("The Connection is faild");
-	}
-	// Define the Execute query
-	String sql = "SELECT * FROM Coupon WHERE ID=" + id;
-	PreparedStatement pstmt = null;
-
-
-	Coupon coupon= new Coupon();
-
-	try (Statement stm = con.createStatement()) {
-
-		pstmt = con.prepareStatement(sql);
-		ResultSet rs = stm.executeQuery(sql);
-
-		if(rs.next()) {
-
-			coupon.setID(rs.getLong(1));
-			coupon.setTitle(rs.getString(2));
-			coupon.setStart_date(rs.getDate(3));
-			coupon.setEnd_date(rs.getDate(4));
-			coupon.setAmount(rs.getInt(5));
-			coupon.setMessage(rs.getString(7));
-			coupon.setPrice(rs.getDouble(8));
-			coupon.setImage(rs.getString(9));
-
-			switch (rs.getString(6)) {
-
-			case "Food":
-
-				coupon.setType(CouponType.Food);
-
-				break;
-
-			case "Resturans":
-
-				coupon.setType(CouponType.Resturans);
-
-				break;
-
-			case "Electricity":
-
-				coupon.setType(CouponType.Electricity);
-
-				break;
-
-			case "Health":
-
-				coupon.setType(CouponType.Health);
-
-				break;
-
-			case "Sports":
-
-				coupon.setType(CouponType.Sports);
-
-				break;
-
-			case "Camping":
-
-				coupon.setType(CouponType.Camping);
-
-				break;
-
-			case "Traveling":
-
-				coupon.setType(CouponType.Traveling);
-
-				break;
-
-			default:
-
-				System.out.println("Coupon not existent");
-
-				break;
-
-
-			}}
-		//System.out.println(coupon);	
-		return coupon;
-	} catch (SQLException e) {
-		System.out.println(e);
-
-		throw new CouponException("unable to get coupon data");
-
-	} finally {
-		// finally block used to close resources
-
+		List<Coupon> coupons = getAllCompanyCoupon(company);
+		List<Coupon> couponByType = new ArrayList<Coupon>();
 		try {
-			if (pstmt != null) {
-				ConnectionPool.getInstance().returnConnection(con);
-			}
-		} catch (Exception e) {
-			throw new CouponException("The close connection action faild");
-		}
-		try {
-			if (con != null) {
-				ConnectionPool.getInstance().returnConnection(con);
-			}
-		} catch (Exception e) {
-			throw new CouponException("The close connection action faild");
+			for (Coupon coupon : coupons) {
+
+				if (coupon.getType().equals(type)) {
+
+					couponByType.add(coupon);
+				}}}
+
+		catch (Exception e) {
+			System.out.println(e);
 		}
 
-
+		return couponByType;
 	}
-}
 
-@Override
-public Client login(String user, String password, ClientType clientType) {
-	return null;
-}
+	public List<Coupon> getCouponbyType(CouponType type) throws Exception{
+		List<Coupon> coupons = getAllCompanyCoupon(this.company);
+		List<Coupon> couponByType = new ArrayList<Coupon>();
+		try {
+			for (Coupon coupon : coupons) {
+				if (coupon.getType().equals(type)) {
+					couponByType.add(coupon);
+				}}}
+		catch (Exception e) {
+			System.out.println(e);
+		}
+		return couponByType;
+	}
+	
+	public List<Coupon> getCouponByPrice (double price) throws Exception{
+		List<Coupon> coupons = getAllCompanyCoupon(this.company);
+		List<Coupon> couponByPrice = new ArrayList<Coupon>();
+		try {
+			for (Coupon coupon : coupons) {
+				if (coupon.getPrice() <= price) {
+					couponByPrice.add(coupon);
+				}}}
+		catch (Exception e) {
+			System.out.println(e);
+		}
+		return couponByPrice;
+	}
+
+	public List<Coupon> getCouponByDate (Date endDate) throws Exception{
+		List<Coupon> coupons = getAllCompanyCoupon(this.company);
+		List<Coupon> couponByDate = new ArrayList<Coupon>();
+		try {
+			for (Coupon coupon : coupons) {
+				if (coupon.getEnd_date().equals(endDate)|| coupon.getEnd_date().before(endDate)) {
+					couponByDate.add(coupon);
+				}}}
+		catch (Exception e) {
+			System.out.println(e);
+		}
+		return couponByDate;
+	}
+	// method that can retrieve a coupon from the DB by id
+	public Coupon getCoupon(long id) throws CouponException {
+		Connection con;
+
+		// Open a connection from the connection pool class
+		try {
+			con = ConnectionPool.getInstance().getConnection();
+		} catch (Exception e) {
+			throw new CouponException("The Connection is faild");
+		}
+		// Define the Execute query
+		String sql = "SELECT * FROM Coupon WHERE ID=" + id;
+		PreparedStatement pstmt = null;
+
+
+		Coupon coupon= new Coupon();
+
+		try (Statement stm = con.createStatement()) {
+
+			pstmt = con.prepareStatement(sql);
+			ResultSet rs = stm.executeQuery(sql);
+
+			if(rs.next()) {
+
+				coupon.setID(rs.getLong(1));
+				coupon.setTitle(rs.getString(2));
+				coupon.setStart_date(rs.getDate(3));
+				coupon.setEnd_date(rs.getDate(4));
+				coupon.setAmount(rs.getInt(5));
+				coupon.setMessage(rs.getString(7));
+				coupon.setPrice(rs.getDouble(8));
+				coupon.setImage(rs.getString(9));
+
+				switch (rs.getString(6)) {
+
+				case "Food":
+
+					coupon.setType(CouponType.Food);
+
+					break;
+
+				case "Resturans":
+
+					coupon.setType(CouponType.Resturans);
+
+					break;
+
+				case "Electricity":
+
+					coupon.setType(CouponType.Electricity);
+
+					break;
+
+				case "Health":
+
+					coupon.setType(CouponType.Health);
+
+					break;
+
+				case "Sports":
+
+					coupon.setType(CouponType.Sports);
+
+					break;
+
+				case "Camping":
+
+					coupon.setType(CouponType.Camping);
+
+					break;
+
+				case "Traveling":
+
+					coupon.setType(CouponType.Traveling);
+
+					break;
+
+				default:
+
+					System.out.println("Coupon not existent");
+
+					break;
+
+
+				}}
+			//System.out.println(coupon);	
+			return coupon;
+		} catch (SQLException e) {
+			System.out.println(e);
+
+			throw new CouponException("unable to get coupon data");
+
+		} finally {
+			// finally block used to close resources
+
+			try {
+				if (pstmt != null) {
+					ConnectionPool.getInstance().returnConnection(con);
+				}
+			} catch (Exception e) {
+				throw new CouponException("The close connection action faild");
+			}
+			try {
+				if (con != null) {
+					ConnectionPool.getInstance().returnConnection(con);
+				}
+			} catch (Exception e) {
+				throw new CouponException("The close connection action faild");
+			}
+
+
+		}
+	}
+
+	@Override
+	public Client login(String user, String password, ClientType clientType) {
+		return null;
+	}
+
+	public Company getCompany(long companyId) throws Exception {
+		Connection con;
+
+		// Open a connection from the connection pool class
+		try {
+			con = ConnectionPool.getInstance().getConnection();
+		} catch (Exception e) {
+			throw new CouponException("The Connection is faild");
+		}
+		
+		// Define the Execute query
+		String sql = "SELECT * FROM Company WHERE ID=" + companyId;
+		PreparedStatement pstmt = null;
+
+		Company company = new Company();
+		try (Statement stm = con.createStatement()) {
+
+			pstmt = con.prepareStatement(sql);
+			ResultSet rs = stm.executeQuery(sql);
+
+			if(rs.next()) {
+				company.setId(rs.getLong(1));
+				company.setComp_name(rs.getString(2));
+				company.setPassword(rs.getString(3));
+				company.setEmail(rs.getString(4));
+			}
+			return company;
+		}catch (Exception e) {
+			System.out.println(e);
+
+		} finally {
+			// finally block used to close resources
+
+			try {
+				if (pstmt != null) {
+					ConnectionPool.getInstance().returnConnection(con);
+				}
+			} catch (Exception e) {
+				throw new CouponException("The close connection action faild");
+			}
+			try {
+				if (con != null) {
+					ConnectionPool.getInstance().returnConnection(con);
+				}
+			} catch (Exception e) {
+				throw new CouponException("The close connection action faild");
+			}
+
+		}
+		return company;
+	}
+
 }
