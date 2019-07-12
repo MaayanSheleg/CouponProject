@@ -17,10 +17,12 @@ import com.mbms.enums.CouponType;
 import com.mbms.main.ConnectionPool;
 import com.mbms.main.Utils;
 
+
 /**
  * @author Maytal & mayaan *
 */
 public class CustomerFacade implements Client {
+	
 
 	private CustomerDBDAO customerDBDAO = new CustomerDBDAO(); 
 	private Customer customer;
