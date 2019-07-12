@@ -22,13 +22,15 @@ public class myTest {
 		Company companyTestService = new Company(101010, "service", "winwin", "service@service.com");
 		CompanyFacade companyFacade = new CompanyFacade();
 		Coupon couponService = new Coupon("Service", Utils.getCurrentDate(), Utils.getExpiredDateNextDay(), 12, CouponType.Electricity, "please work", 10, "image");
+		Coupon couponCoupon = new Coupon("Service please !!!", Utils.getCurrentDate(), Utils.getExpiredDateNextDay(), 12, CouponType.Electricity, "please work", 10, "image");
+		
 		
 		try {
-			adminFacade.insertCompany(companyTestService);
+		//	adminFacade.insertCompany(companyTestService);
 			companyFacade = (CompanyFacade)couponSystem.login("service", "winwin", ClientType.COMPANY);
-			companyFacade.insertCoupon(couponService);
+			companyFacade.insertCoupon(couponCoupon);
 		} catch (Exception e) {
-			System.out.println("failed connect as company");
+			System.out.println(e);
 			e.printStackTrace();
 		}
 

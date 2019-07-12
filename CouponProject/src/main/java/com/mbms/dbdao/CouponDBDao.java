@@ -57,7 +57,7 @@ public class CouponDBDao implements CouponDao {
 		} catch (SQLException e) {
 			System.out.println(e);
 
-			throw new CouponException("Company creation failed");
+			throw new CouponException("Coupon creation failed");
 
 		} finally {// finally block used to close resources
 			try {

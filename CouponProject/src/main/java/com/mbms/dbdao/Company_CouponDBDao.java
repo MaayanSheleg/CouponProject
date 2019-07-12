@@ -51,18 +51,19 @@ public class Company_CouponDBDao implements Company_CouponDao {
 		PreparedStatement pstmt = null;
 		pstmt = con.prepareStatement(sql);
 		
-		con = DriverManager.getConnection(Database.getDBUrl());
+	//	con = DriverManager.getConnection(Database.getDBUrl());
 		
 		try  {
 			pstmt.setLong(1, company.getId());
 			pstmt.setLong(2, coupon.getID());
 			pstmt.executeUpdate();
-			
+
+
 			System.out.println("Company_Coupon added. companyId: " + company.getId() + " couponId: " + coupon.getID());
 		
 		} catch (SQLException e) {
-			throw new Exception("Company_Coupon addition failed. companyId: " + company.getId() + " couponId: " + coupon.getID());
-		
+//			throw new Exception("Company_Coupon addition failed. companyId: " + company.getId() + " couponId: " + coupon.getID());
+		System.out.println(e.getMessage());
 		} finally {
 			// finally block used to close resources
 			try {
@@ -83,6 +84,9 @@ public class Company_CouponDBDao implements Company_CouponDao {
 	
 	}
 
+
+	
+	
 	@Override
 	public void removeCompany_Coupon(Coupon coupon) throws Exception {
 

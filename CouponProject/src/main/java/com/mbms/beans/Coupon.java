@@ -1,6 +1,6 @@
 package com.mbms.beans;
 
-import java.util.Date;
+import java.sql.Date;
 
 import com.mbms.enums.CouponType;
 

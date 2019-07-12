@@ -53,22 +53,22 @@ public class CompanyService {
 		return companyFacade;
 	}
 
-	//	@POST
-	//	@Path("createCoupon")
-	//	@Consumes(MediaType.APPLICATION_JSON)
-	//	@Produces(MediaType.APPLICATION_JSON)
-	//	public String createCoupon(Coupon coupon)throws Exception {
-	//		CompanyFacade companyFacade = getFacade();
-	//		try {
-	//			coupon= companyFacade.insertCoupon(coupon);
-	//			return new Gson().toJson(coupon);
-	//
-	//		} catch (Exception e) {
-	//			e.printStackTrace();
-	//
-	//		}
-	//		return null;
-	//	}
+	@POST
+	@Path("createCoupon")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String createCoupon(Coupon coupon)throws Exception {
+		CompanyFacade companyFacade = getFacade();
+		try {
+			coupon= companyFacade.insertCoupon(coupon);
+			return new Gson().toJson(coupon);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+
+		}
+		return null;
+	}
 
 	//Remove coupon
 	@DELETE
