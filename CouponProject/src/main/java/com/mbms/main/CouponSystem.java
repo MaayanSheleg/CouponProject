@@ -5,8 +5,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.security.auth.login.LoginException;
+
 import com.mbms.Exceptions.CouponException;
 import com.mbms.beans.Company;
+import com.mbms.beans.Customer;
 import com.mbms.dao.Client;
 import com.mbms.dbdao.CompanyDBDAO;
 import com.mbms.dbdao.CustomerDBDAO;
@@ -79,13 +82,20 @@ public class CouponSystem {
 
 		case CUSTOMER:
 		
-			if (clientType == ClientType.CUSTOMER) {
-				
-				CustomerDBDAO customerDBDAO = new CustomerDBDAO();
-				boolean loginSuccess = customerDBDAO.login(name, password);
-				if(loginSuccess) {
-				client = new CustomerFacade();
-				}}
+			CustomerDBDAO customerDAO = new CustomerDBDAO();
+			
+			Collection<Customer>customers = customerDAO.getAllCustomer();
+			Iterator<Customer> c = customers.iterator();
+			
+			while (c.hasNext()) {
+				Customer current2 = c.next();
+				if (current2.getCust_name().equals(name) && current2.getPassword().equals(password)) {
+					CustomerFacade customerFacade = new CustomerFacade(current2);
+					return customerFacade;
+				}else if (!c.hasNext()) {
+					throw new LoginException("Login Falied! Invalid User or Password!");
+				}
+			}
 				break;
 
 		default:

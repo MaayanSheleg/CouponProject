@@ -2,7 +2,9 @@ package com.mbms.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
+import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -30,7 +32,7 @@ public class CustomerService{
 	private HttpServletResponse response;
 
 	Gson gson = new Gson();
-	
+
 	public CustomerService() {
 	}
 
@@ -39,99 +41,74 @@ public class CustomerService{
 		customer = (CustomerFacade)request.getSession(false).getAttribute("facade");
 		return customer;
 	}
-	
-//	@POST
-//	@Path("purchaseCoupon")
-//	@Consumes(MediaType.APPLICATION_JSON)
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public String purchaseCoupon(Customer customer ,Coupon coupon)	{
-//
-//		CustomerFacade customerFacade = getFacade();
-//		String failMsg = "FAILED TO purchase coupon";
-//
-//		try {
-//			if(customer != null) {
-//				if (coupon != null) {
-//					customerFacade.buyCoupon(customer, coupon);
-//					return "THE CUSTOMER: " + customer.getCust_name() + "SUCCEED TO PURCHASE COUPON: " + coupon.getTitle();
-//				}
-//			}
-//		} catch (Exception e) {
-//			System.out.println();
-//		}
-//		return failMsg;
-//	}
-//
-//	@GET
-//	@Path("getPurchaseCoupon/{customerId}")
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public String getPurchaseCoupon(@PathParam("customerId") long id)  {
-//
-//		CustomerFacade customerFacade = getFacade();
-//		String failMsg = "FAILED TO get purchase coupon";
-//		try {
-//			 customerFacade.buyCoupon(temp, titi);
-//			if (customer != null) {
-//				return new Gson().toJson(customer);				
-//			}
-//			List<Coupon> buycoupons = customerFacade.getAllPurchasedCouponsByCustomer(customer);
-//			return new Gson().toJson(buycoupons);				
-//		
-//		} catch (Exception e) {
-//			System.out.println(e);
-//		}
-//
-//		return "FAILED TO GET CUSTOMER";
-//	}
 
-//	@GET
-//	@Path("getCoupontype")
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public String getAllPurchasedCouponsByType(@PathParam("customerId") long id, CouponType type)  {
-//
-//		CustomerFacade customerFacade = getFacade();
-//		String failMsg = "FAILED TO get coupon by type";
-//		AdminFacade admin = getAdmin();
-//		try {
-//			Customer customer = admin.getCustomer(id);
-//			if (customer != null) {
-//				return new Gson().toJson(customer);				
-//			}
-//			
-//			List<Coupon> couponstype = customerFacade.getAllPurchasedCouponsByType( customer,type);
-//			
-//			return new Gson().toJson(couponstype);				
-//		
-//		} catch (Exception e) {
-//			System.out.println(e);
-//		}
-//
-//		return "FAILED TO GET CUSTOMER";
-//	}
-//
-//	@GET
-//	@Path("getCouponbyprice")
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public String  getAllPurchasedCouponByPrice(@PathParam("customerId") long id, double price)  {
-//
-//		CustomerFacade customerFacade = getFacade();
-//		String failMsg = "FAILED TO get coupon by type";
-//		AdminFacade admin = getAdmin();
-//		try {
-//			Customer customer = admin.getCustomer(id);
-//			if (customer != null) {
-//				return new Gson().toJson(customer);				
-//			}
-//			
-//			List<Coupon> couponsprice = customerFacade.getAllPurchasedCouponByPrice( customer,price);
-//			
-//			return new Gson().toJson(couponsprice);				
-//		
-//		} catch (Exception e) {
-//			System.out.println(e);
-//		}
-//
-//		return "FAILED TO GET CUSTOMER";
-//	}
+	//	@POST
+	//	@Path("purchaseCoupon")
+	//	@Consumes(MediaType.APPLICATION_JSON)
+	//	@Produces(MediaType.APPLICATION_JSON)
+	//	public String purchaseCoupon(Customer customer ,Coupon coupon)	{
+	//
+	//		CustomerFacade customerFacade = getFacade();
+	//		String failMsg = "FAILED TO purchase coupon";
+	//
+	//		try {
+	//			if(customer != null) {
+	//				if (coupon != null) {
+	//					customerFacade.buyCoupon(customer, coupon);
+	//					return "THE CUSTOMER: " + customer.getCust_name() + "SUCCEED TO PURCHASE COUPON: " + coupon.getTitle();
+	//				}
+	//			}
+	//		} catch (Exception e) {
+	//			System.out.println();
+	//		}
+	//		return failMsg;
+	//	}
+
+	// GET All Purchased Coupons by id
+	@GET
+	@Path("getAllPurchasedCoupons/{customerId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getAllPurchasedCoupons(@PathParam("customerId") long customerId) throws LoginException{
+		CustomerFacade customerFacade = getFacade();
+		try {
+			List <Long> coupons = customerFacade.getAllpurchasedCoupons(customerId);
+			return new Gson().toJson(coupons);
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return null;
+	}
+
+	// GET Coupon by Type
+	@GET
+	@Path("getCouponbyType/{couponType}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getCouponbyType(@PathParam("couponType") CouponType couponType ) throws Exception{
+		CustomerFacade customerFacade = getFacade();
+		try {
+			List<Coupon>coupons = customerFacade.getCouponbyType(couponType);
+			return new Gson().toJson(coupons);
+
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return null;
+	}
+
+	// GET Coupon by price
+	@GET
+	@Path("getCouponbyPrice/{couponPrice}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getCouponbyPrice(@PathParam("couponPrice") double price ) throws Exception{
+		CustomerFacade customerFacade = getFacade();
+		try {
+			List<Coupon>coupons = customerFacade.getCouponByPrice(price);
+			return new Gson().toJson(coupons);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return null;
+	}
 
 }

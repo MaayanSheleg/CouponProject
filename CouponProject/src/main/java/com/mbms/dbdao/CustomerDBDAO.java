@@ -15,6 +15,7 @@ import java.util.Set;
 import com.mbms.Exceptions.CompanyException;
 import com.mbms.Exceptions.LogingException;
 import com.mbms.beans.Company;
+import com.mbms.beans.Coupon;
 import com.mbms.beans.Customer;
 import com.mbms.dao.CustomerDao;
 import com.mbms.main.ConnectionPool;
@@ -22,7 +23,7 @@ import com.mbms.tables.Database;
 
 /**
  * @author Maytal & mayaan *
-*/
+ */
 public class CustomerDBDAO implements CustomerDao {
 	private static Connection con;
 
@@ -227,7 +228,7 @@ public class CustomerDBDAO implements CustomerDao {
 	public Customer getCustomerById(long id) throws Exception {
 
 		Connection con;
-		
+
 		// Open a connection from the connection pool class
 		try {
 			con = ConnectionPool.getInstance().getConnection();
@@ -237,7 +238,7 @@ public class CustomerDBDAO implements CustomerDao {
 		// Define the Execute query
 		String sql = "SELECT * FROM Customer WHERE ID=" + id;
 		PreparedStatement pstmt = null;
-		
+
 		Customer customer= new Customer();
 
 		try (Statement stm = con.createStatement()) {
@@ -250,7 +251,7 @@ public class CustomerDBDAO implements CustomerDao {
 			customer.setPassword(rs.getString(3));
 			System.out.println(customer);
 		}
-		
+
 		catch (SQLException e) {
 
 			throw new CompanyException("unable to get customer data");
@@ -271,9 +272,9 @@ public class CustomerDBDAO implements CustomerDao {
 				throw new CompanyException("The close connection action faild");
 			}
 		}return customer;
-	
+
 	}
-	
+
 	@SuppressWarnings("finally")
 	public boolean ifCustomerNameExists(String cust) throws Exception {
 		Connection con;
@@ -472,51 +473,98 @@ public class CustomerDBDAO implements CustomerDao {
 		}
 	}
 
-@SuppressWarnings("finally")
-public boolean login(String name, String password)throws LogingException, SQLException
-{
-	// Open a connection from the connection pool class
+	@SuppressWarnings("finally")
+	public boolean login(String name, String password)throws LogingException, SQLException
+	{
+		// Open a connection from the connection pool class
 		try {
-					con = ConnectionPool.getInstance().getConnection();
+			con = ConnectionPool.getInstance().getConnection();
 		} catch (Exception e) {
 			throw new LogingException("The Connection is faild");
 		}
-	// Define the Execute query
-		
-	boolean loginSuccess  = false;
-	String query = "SELECT * FROM Customer WHERE CUSTNAME=? AND PASSWORD=?";
-	PreparedStatement pstmt = con.prepareStatement(query);
-	
-	try {
-	
-		pstmt.setString(1, name);
-		pstmt.setString(2, password);
-		ResultSet rs = pstmt.executeQuery();
-		if (rs.next()) {
-		loginSuccess = true;
-	}
-	
-} catch (Exception e) {
-	throw new LogingException("logging is failed!");
-} finally {// finally block used to close resources
-	try {
-		if (pstmt != null) {
-			ConnectionPool.getInstance().returnConnection(con);
+		// Define the Execute query
+
+		boolean loginSuccess  = false;
+		String query = "SELECT * FROM Customer WHERE CUSTNAME=? AND PASSWORD=?";
+		PreparedStatement pstmt = con.prepareStatement(query);
+
+		try {
+
+			pstmt.setString(1, name);
+			pstmt.setString(2, password);
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) {
+				loginSuccess = true;
+			}
+
+		} catch (Exception e) {
+			throw new LogingException("logging is failed!");
+		} finally {// finally block used to close resources
+			try {
+				if (pstmt != null) {
+					ConnectionPool.getInstance().returnConnection(con);
+				}
+			} catch (Exception e) {
+				throw new LogingException("The close connection action faild");
+			}
+			try {
+				if (con != null) {
+					ConnectionPool.getInstance().returnConnection(con);
+				}
+			} catch (Exception e) {
+				throw new LogingException("The close connection action faild");
+			}
+			return loginSuccess;
 		}
-	} catch (Exception e) {
-		throw new LogingException("The close connection action faild");
-	}
-	try {
-		if (con != null) {
-			ConnectionPool.getInstance().returnConnection(con);
-		}
-	} catch (Exception e) {
-		throw new LogingException("The close connection action faild");
-	}
-	return loginSuccess;
-}
 
 
-}
+	}
+
+	public List<Long> getCustomerCoupons(long customerId) throws Exception {
+		// Open a connection from the connection pool class
+				try {
+					con = ConnectionPool.getInstance().getConnection();
+				} catch (Exception e) {
+					throw new LogingException("The Connection is faild");
+				}
+				// Define the Execute query
+
+				boolean loginSuccess  = false;
+				List <Long> coupons = new ArrayList<Long>();
+				String sql = "SELECT * FROM Customer_Coupon WHERE CUSTOMER_ID=" + customerId;
+				PreparedStatement pstmt = con.prepareStatement(sql);
+
+				try {
+
+					Statement stm = con.createStatement();
+					ResultSet rs = stm.executeQuery(sql);
+					while (rs.next()) {
+						long couponId = rs.getLong(2);
+
+						coupons.add(couponId);
+					}
+
+				} catch (Exception e) {
+					throw new LogingException("logging is failed!");
+				} finally {
+					// finally block used to close resources
+					try {
+						if (pstmt != null) {
+							ConnectionPool.getInstance().returnConnection(con);
+						}
+					} catch (Exception e) {
+						throw new LogingException("The close connection action faild");
+					}
+					try {
+						if (con != null) {
+							ConnectionPool.getInstance().returnConnection(con);
+						}
+					} catch (Exception e) {
+						throw new LogingException("The close connection action faild");
+					}
+					return coupons;
+				}
+	}
+
 }
 

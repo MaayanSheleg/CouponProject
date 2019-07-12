@@ -169,4 +169,47 @@ public class CustomerFacade implements Client {
 		public Client login(String user, String password, ClientType clientType) {
 			return null;
 		}
+
+
+		public List<Coupon> getCouponByPrice (double price) throws Exception{
+			List<Coupon> coupons = getAllCustomerCoupon(this.customer);
+			List<Coupon> couponByPrice = new ArrayList<Coupon>();
+			try {
+				for (Coupon coupon : coupons) {
+					if (coupon.getPrice() <= price) {
+						couponByPrice.add(coupon);
+					}}}
+			catch (Exception e) {
+				System.out.println(e);
+			}
+			return couponByPrice;
+		}
+
+		public List<Coupon> getAllCustomerCoupon(Customer customer) throws Exception {
+			long customerId= customer.getId();
+			List<Long> coupons = customerDBDAO.getCustomerCoupons(customerId);
+			List<Coupon> allcoupons = new ArrayList<Coupon>();
+			for (Long id : coupons) {
+				allcoupons.add(couponDBDao.getCoupon(id));
+			}
+			return allcoupons;
+		}
+
+		public List<Coupon> getCouponbyType(CouponType type) throws Exception{
+			List<Coupon> coupons = getAllCustomerCoupon(this.customer);
+			List<Coupon> couponByType = new ArrayList<Coupon>();
+			try {
+				for (Coupon coupon : coupons) {
+					if (coupon.getType().equals(type)) {
+						couponByType.add(coupon);
+					}}}
+			catch (Exception e) {
+				System.out.println(e);
+			}
+			return couponByType;
+		}
+
+		public List <Long> getAllpurchasedCoupons(long customerId) throws Exception{
+			return customerDBDAO.getCustomerCoupons(customerId);
+		}
 }	
