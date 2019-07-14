@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.util.Collection;
 import java.util.Set;
 
+import com.mbms.beans.Coupon;
 import com.mbms.beans.Customer;
 
 /**
@@ -37,6 +38,8 @@ public interface CustomerDao {
 	void removeCustomerById(long id) throws Exception;
 
 	void removeAllPurchasedCustomerCoupons(long id) throws Exception;
+
+	void customerPurchaseCoupon(Coupon coupon, Customer customer) throws Exception;
 }
 
 

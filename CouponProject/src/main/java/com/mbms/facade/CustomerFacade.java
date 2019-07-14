@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import com.mbms.beans.Coupon;
 import com.mbms.beans.Customer;
@@ -213,5 +215,28 @@ public class CustomerFacade implements Client {
 
 		public List <Long> getAllpurchasedCoupons(long customerId) throws Exception{
 			return customerDBDAO.getCustomerCoupons(customerId);
+		}
+
+		public void purchaseCoupon(long couponId) throws Exception {
+			try {
+				Coupon custcoupon = couponDBDao.getCoupon(couponId);
+				this.customer = customerDBDAO.getCustomerById(this.customer.getId());
+				
+				if (custcoupon == null) {
+					throw new Exception("This coupon doesn't exist, customer failed purchase coupon");
+				}
+				if (custcoupon.getAmount() <= 0) {
+					throw new Exception("cannot buy coupon with 0 amount");
+				}	
+				if (custcoupon.getEnd_date().getTime() <= Utils.getCurrentDate().getTime()) {
+					throw new Exception("This coupon is out of stock !");
+				}
+				customerDBDAO.customerPurchaseCoupon(custcoupon, this.customer);
+				custcoupon.setAmount(custcoupon.getAmount()-1);
+				couponDBDao.updateCoupon(custcoupon);
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
+			
 		}
 }	

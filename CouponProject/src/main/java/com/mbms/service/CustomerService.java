@@ -15,6 +15,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 import com.mbms.beans.Coupon;
@@ -32,7 +33,6 @@ public class CustomerService{
 	private HttpServletResponse response;
 
 	Gson gson = new Gson();
-
 	public CustomerService() {
 	}
 
@@ -42,27 +42,26 @@ public class CustomerService{
 		return customer;
 	}
 
-	//	@POST
-	//	@Path("purchaseCoupon")
-	//	@Consumes(MediaType.APPLICATION_JSON)
-	//	@Produces(MediaType.APPLICATION_JSON)
-	//	public String purchaseCoupon(Customer customer ,Coupon coupon)	{
-	//
-	//		CustomerFacade customerFacade = getFacade();
-	//		String failMsg = "FAILED TO purchase coupon";
-	//
-	//		try {
-	//			if(customer != null) {
-	//				if (coupon != null) {
-	//					customerFacade.buyCoupon(customer, coupon);
-	//					return "THE CUSTOMER: " + customer.getCust_name() + "SUCCEED TO PURCHASE COUPON: " + coupon.getTitle();
-	//				}
-	//			}
-	//		} catch (Exception e) {
-	//			System.out.println();
-	//		}
-	//		return failMsg;
-	//	}
+	// PURCHASE Coupon
+	@POST
+	@Path("purchaseCoupon/{couponId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response purchaseCoupon(@PathParam("couponId")long couponId) throws LoginException, Exception {
+
+		CustomerFacade customerFacade = getFacade();
+
+		try {
+			customerFacade.purchaseCoupon(couponId);
+			String res = "CUSTOMER SUCCEDD TO PURCHASE COUPON " + couponId;
+			String reString = new Gson().toJson(res);
+			return Response.status(Response.Status.OK).entity(reString).build();
+		}
+		catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		return null;
+	}
 
 	// GET All Purchased Coupons by id
 	@GET

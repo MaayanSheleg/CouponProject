@@ -566,5 +566,35 @@ public class CustomerDBDAO implements CustomerDao {
 				}
 	}
 
+	@Override
+	public void customerPurchaseCoupon(Coupon coupon, Customer customer) throws Exception {
+		Connection connection = null;
+		try {
+			connection = ConnectionPool.getInstance().getConnection();
+		} catch (Exception e) {
+			throw new Exception("connection pool faild :(");
+		}
+		try {
+			String sql = "INSERT INTO Customer_Coupon (customer_Id,coupon_Id)  VALUES(?,?)";
+			PreparedStatement pstmt = connection.prepareStatement(sql);
+			pstmt.setLong(1, customer.getId());
+			pstmt.setLong(2, coupon.getID());
+
+			pstmt.executeUpdate();
+			pstmt.close();
+
+			// System.out.println("Customer purchase coupon :D ");
+		} catch (SQLException e) {
+			System.err.println("customer failed to purchase coupon :( ");
+			System.err.println(e.getMessage());
+		} finally {
+			try {
+				connection.close();
+			} catch (SQLException e2) {
+				 System.out.println(e2.getMessage());
+			}
+		}
+	}
+
 }
 
