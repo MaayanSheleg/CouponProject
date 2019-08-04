@@ -157,7 +157,8 @@ public class AdminService {
 //	// CREATE a new Customer - add a customer to the Customer Table in DB
 	@POST
 	@Path("createCustomer")
-	@Consumes(MediaType.APPLICATION_JSON)
+	//@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public String createCustomer(Customer customer ) {
 
 		AdminFacade admin = getFacade();

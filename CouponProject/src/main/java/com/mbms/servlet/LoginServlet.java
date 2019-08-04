@@ -14,7 +14,7 @@ import com.mbms.dao.Client;
 import com.mbms.enums.ClientType;
 import com.mbms.main.CouponSystem;
 
-@WebServlet("/login")
+//@WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;

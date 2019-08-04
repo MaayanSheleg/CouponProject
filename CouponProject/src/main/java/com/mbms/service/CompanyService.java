@@ -42,16 +42,16 @@ public class CompanyService {
 	public CompanyService() {
 	}
 
-	//	private CompanyFacade getFacade() {
-	//		CompanyFacade company = null;
-	//		company = (CompanyFacade)request.getSession(false).getAttribute("facade");
-	//		return company;
-	//	}
+		private CompanyFacade getFacade() {
+			CompanyFacade company = null;
+			company = (CompanyFacade)request.getSession(false).getAttribute("facade");
+			return company;
+		}
 
-	public CompanyFacade getFacade() throws Exception {
-		CompanyFacade companyFacade = (CompanyFacade)couponSystem.login("Fedrik", "fff1", ClientType.COMPANY);
-		return companyFacade;
-	}
+//	public CompanyFacade getFacade() throws Exception {
+//		CompanyFacade companyFacade = (CompanyFacade)couponSystem.login("Fedrik", "fff1", ClientType.COMPANY);
+//		return companyFacade;
+//	}
 
 	@POST
 	@Path("createCoupon")
@@ -96,13 +96,13 @@ public class CompanyService {
 	@Path("updateCoupon")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public void updateCoupon(@QueryParam("couponId") long id, @QueryParam("endDate") Date endDate,
+	public void updateCoupon(@QueryParam("couponId") long ID, @QueryParam("endDate") Date end_Date,
 			@QueryParam("price") double price) throws LoginException, Exception {
 		CompanyFacade companyFacade = getFacade();
 		try {
-			Coupon coupon = companyFacade.getCoupon(id);
+			Coupon coupon = companyFacade.getCoupon(ID);
 			if(coupon!=null) {
-				companyFacade.updateCoupon(coupon, endDate, price);
+				companyFacade.updateCoupon(coupon, end_Date, price);
 			}
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -181,7 +181,7 @@ public class CompanyService {
 	@GET
 	@Path("getCouponByPrice/{Price}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getCouponByDate(@PathParam("Price") double price) throws LoginException, Exception {
+	public String getCouponByPrice(@PathParam("Price") double price) throws LoginException, Exception {
 		CompanyFacade companyFacade = getFacade();
 		try {
 			List<Coupon> coupons = companyFacade.getCouponByPrice(price);
